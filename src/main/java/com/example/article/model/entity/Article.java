@@ -1,6 +1,7 @@
 package com.example.article.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.Date;
@@ -19,7 +20,7 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    private UUID userId;
+    private String username;
 
     private String article;
 
