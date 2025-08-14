@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: db/000-create-table.sql
+      relativeToChangelogFile: true
