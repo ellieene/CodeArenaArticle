@@ -1,27 +1,47 @@
 package com.example.article.controller;
 
+import com.example.article.model.dto.ArticleDTO;
+import com.example.article.model.entity.Article;
+import com.example.article.model.request.CreateArticleRequest;
+import com.example.article.model.response.StringResponse;
+import com.example.article.service.impl.ArticleServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.nio.file.AccessDeniedException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/article")
-@Tag(name = "Статьи")
+@Tag(name = "Code Arena Article")
+@RequiredArgsConstructor
 public class ArticleController {
 
-    @PostMapping("/create-article")
-    public ResponseEntity<?> createArticle(){
-        return ResponseEntity.status(HttpStatus.CREATED).body("Статья отправлена на проверку");
+    private final ArticleServiceImpl articleService;
+
+    @PostMapping(value = "/create-article")
+    @Operation(summary = "Создание Статьи")
+    public ResponseEntity<StringResponse> createArticle(@RequestBody CreateArticleRequest createArticleRequest){
+        return ResponseEntity.status(HttpStatus.CREATED).body(articleService.createArticle(createArticleRequest));
     }
 
-//    @GetMapping("/{articleId}")
-//    public ResponseEntity<?> getArticle() {
-//        return ResponseEntity.ok();
-//    }
+    @GetMapping(value = "/{articleId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Получение определенной статьи")
+    public ResponseEntity<ArticleDTO> getArticle(
+            @Parameter(description = "ID статьи", required = true)
+            @PathVariable("articleId") UUID articleId,
+
+            @Parameter(description = "ID пользователя (опционально)")
+            @RequestHeader(value = "userId", required = false)
+            String userId) throws AccessDeniedException {
+        return ResponseEntity.ok(articleService.getArticle(articleId, userId));
+    }
 
 //    @GetMapping("/getAll")
 //    public ResponseEntity<?> getAllArticle() {

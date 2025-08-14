@@ -13,6 +13,7 @@ public class CommonStrings {
     public static final String EDIT_USER_SUCCESSES = "Описание успешно обновлена";
     public static final String EDIT_PASSWORD_USER_SUCCESSES = "Пароль успешно обновлен";
     public static final String ACCESS_DENIED = "Доступ запрещен";
+    public static final String NOT_FOUND_ARTICLE = "Статья не найдена";
 
 
     // Константы с сообщениями об ошибках с JWT токеном

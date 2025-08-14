@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package user;
+
+option java_package = "com.example.grpc.user";
+option java_multiple_files = true;
+
+service UserService {
+  rpc CheckUuidAndUsername (CheckRequest) returns (CheckResponse);
+}
+
+message CheckRequest {
+  string username = 1;
+  string userId = 2;
+}
+
+message CheckResponse {
+  bool isValid = 1;
+}
