@@ -8,4 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface BuyerRepository extends JpaRepository<Buyer, UUID> {
+    boolean existsByArticleIdAndBuyerId(UUID articleId, UUID buyerId);
+
 }

@@ -6,14 +6,24 @@ option java_package = "com.example.grpc.user";
 option java_multiple_files = true;
 
 service UserService {
-  rpc CheckUuidAndUsername (CheckRequest) returns (CheckResponse);
+  rpc PurchasingAnArticle (PurchasingRequest) returns (PurchasingResponse);
+  rpc GetPointsAndUserId (PointsRequest) returns (PointsResponse);
 }
 
-message CheckRequest {
+message PurchasingRequest {
   string username = 1;
-  string userId = 2;
+  int32 points = 2;
 }
 
-message CheckResponse {
-  bool isValid = 1;
+message PurchasingResponse {
+  bool purchasing = 1;
+}
+
+message PointsRequest {
+  string username = 1;
+}
+
+message PointsResponse {
+  string userId = 1;
+  int32 points = 2;
 }

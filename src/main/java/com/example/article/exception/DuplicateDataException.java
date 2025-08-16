@@ -1,7 +1,7 @@
 package com.example.article.exception;
 
 /**
- * Исключение, для обозначения повторения логина
+ * Исключение, дубликатов.
  */
 public class DuplicateDataException extends RuntimeException {
     public DuplicateDataException(String message) {

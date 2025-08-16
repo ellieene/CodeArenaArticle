@@ -22,6 +22,8 @@ public class Article {
 
     private String username;
 
+    private String title;
+
     private String article;
 
     private String description_article;

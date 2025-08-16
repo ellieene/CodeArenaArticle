@@ -13,7 +13,9 @@ public class ArticleDTO {
 
     private String username;
     private String article;
+    private String title;
     private Date date;
     private int price;
+    private boolean purchased;
     private boolean owner;
 }

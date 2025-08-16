@@ -1,8 +1,8 @@
 package com.example.article.controller;
 
 import com.example.article.model.dto.ArticleDTO;
-import com.example.article.model.entity.Article;
-import com.example.article.model.request.CreateArticleRequest;
+import com.example.article.model.enums.Role;
+import com.example.article.model.request.ArticleRequest;
 import com.example.article.model.response.StringResponse;
 import com.example.article.service.impl.ArticleServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
 @RestController
@@ -27,8 +26,10 @@ public class ArticleController {
 
     @PostMapping(value = "/create-article")
     @Operation(summary = "Создание Статьи")
-    public ResponseEntity<StringResponse> createArticle(@RequestBody CreateArticleRequest createArticleRequest){
-        return ResponseEntity.status(HttpStatus.CREATED).body(articleService.createArticle(createArticleRequest));
+    public ResponseEntity<StringResponse> createArticle(
+            @RequestBody ArticleRequest articleRequest,
+            @RequestHeader(value = "username", required = false) String username) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(articleService.createArticle(articleRequest, username));
     }
 
     @GetMapping(value = "/{articleId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -37,10 +38,10 @@ public class ArticleController {
             @Parameter(description = "ID статьи", required = true)
             @PathVariable("articleId") UUID articleId,
 
-            @Parameter(description = "ID пользователя (опционально)")
-            @RequestHeader(value = "userId", required = false)
-            String userId) throws AccessDeniedException {
-        return ResponseEntity.ok(articleService.getArticle(articleId, userId));
+            @RequestHeader(value = "username", required = false) String username,
+            @RequestHeader(value = "userId", required = false) String userId
+    ) {
+        return ResponseEntity.ok(articleService.getArticle(articleId, username, userId));
     }
 
 //    @GetMapping("/getAll")
@@ -48,20 +49,29 @@ public class ArticleController {
 //        return ResponseEntity.ok();
 //    }
 
-//    @PutMapping("/edit-article/{articleId}")
-//    public ResponseEntity<?> editArticle() {
-//        return ResponseEntity.ok();
-//    }
+    @Operation(summary = "Изменение статьи")
+    @PutMapping("/edit-article/{articleId}")
+    public ResponseEntity<StringResponse> editArticle(@PathVariable UUID articleId,
+                                                      @RequestHeader(value = "username", required = false) String username,
+                                                      @RequestBody ArticleRequest articleRequest) {
+        return ResponseEntity.ok(articleService.editArticle(articleId, articleRequest, username));
+    }
 
-//    @DeleteMapping("/delete-article/{articleId}")
-//    public ResponseEntity<?> deleteArticle() {
-//        return ResponseEntity.ok();
-//    }
+    @Operation(summary = "Удаление статьи")
+    @DeleteMapping("/delete-article/{articleId}")
+    public ResponseEntity<StringResponse> deleteArticle(@PathVariable UUID articleId,
+                                                        @RequestHeader(value = "username", required = false) String username,
+                                                        @RequestHeader(value = "role", required = false) Role role) {
+        return ResponseEntity.ok(articleService.deleteArticle(articleId, username, role));
+    }
+    //+
 
-// @PostMapping("/purchasing-an-article/{articleId}")
-//    public ResponseEntity<?> purchasingAnArticle() {
-//        return ResponseEntity.ok();
-//    }
+    @Operation(summary = "Покупка статьи")
+    @PostMapping("/purchasing-an-article/{articleId}")
+    public ResponseEntity<StringResponse> purchasingAnArticle(@PathVariable UUID articleId,
+                                                              @RequestHeader(value = "username", required = false) String username) {
+        return ResponseEntity.ok(articleService.purchasingAnArticle(articleId, username));
+    }
 
 // @PostMapping("/add-to-favorites/{articleId}")
 //    public ResponseEntity<?> addToFavoritesArticle() {

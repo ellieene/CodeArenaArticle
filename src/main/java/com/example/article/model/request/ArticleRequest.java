@@ -5,14 +5,14 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
 
 
-public record CreateArticleRequest(
-        @Schema(description = "Username", example = "user1")
-        @Size(min = 5, max = 50, message = "Username должен содержать от 5 до 50 символов.")
-        @NotBlank(message = "Username не может быть пустым.")
-        String username,
+public record ArticleRequest(
+
+        @Schema(description = "Title", example = "Название статьи")
+        @Size(min = 5, max = 256, message = "Название статьи должно содержать от 5 до 256 символов.")
+        @NotBlank(message = "Название статьи не может быть пустым.")
+        String title,
 
         @Schema(description = "Article", example = "Статья")
         @NotBlank(message = "Статья не может быть пустой.")
@@ -24,7 +24,7 @@ public record CreateArticleRequest(
         String description_article,
 
         @Schema(description = "Price", example = "0")
-        @Min(value = 0, message = "Цена не может быть отрицательной")
-        @Max(value = 500, message = "Цена не может превышать 500 монет")
+        @Min(value = 0, message = "Цена не может быть отрицательной.")
+        @Max(value = 500, message = "Цена не может превышать 500 монет.")
         int price
 ) {}
