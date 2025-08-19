@@ -2,12 +2,28 @@ syntax = "proto3";
 
 package user;
 
-option java_package = "com.example.grpc.user";
+option java_package = "com.example.grpc.profileAndArticle";
 option java_multiple_files = true;
 
 service UserService {
   rpc PurchasingAnArticle (PurchasingRequest) returns (PurchasingResponse);
   rpc GetPointsAndUserId (PointsRequest) returns (PointsResponse);
+  rpc GetArticleFromFavoritesByUser(FavoriteRequest) returns (FavoriteResponse);
+}
+
+message FavoriteRequest {
+  string userId = 1;
+}
+
+message FavoriteResponse {
+  repeated FavoriteArticle articles = 1;
+}
+
+message FavoriteArticle {
+  string username = 1;
+  string article_id = 2;
+  string title = 3;
+  int32 price = 4;
 }
 
 message PurchasingRequest {

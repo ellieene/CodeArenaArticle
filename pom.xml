@@ -19,6 +19,8 @@
 		<java.version>21</java.version>
 		<grpc.version>1.62.2</grpc.version>
 		<protobuf.version>0.9.4</protobuf.version>
+		<maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+		<lombok.version>1.18.32</lombok.version>
 	</properties>
 
 	<dependencies>
@@ -63,6 +65,11 @@
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
 			<version>3.25.1</version>
+		</dependency>
+		<dependency>
+			<groupId>net.devh</groupId>
+			<artifactId>grpc-server-spring-boot-starter</artifactId>
+			<version>2.15.0.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.annotation</groupId>

@@ -7,14 +7,17 @@ import com.example.article.model.dto.ArticleDTO;
 import com.example.article.model.dto.ArticleMiniDTO;
 import com.example.article.model.entity.Article;
 import com.example.article.model.entity.Buyer;
+import com.example.article.model.entity.Favorite;
 import com.example.article.model.enums.Role;
+import com.example.article.model.key.FavoriteId;
 import com.example.article.model.request.ArticleRequest;
 import com.example.article.model.request.PointsAndUserIdRequest;
 import com.example.article.model.response.StringResponse;
 import com.example.article.repository.ArticleRepository;
 import com.example.article.repository.BuyerRepository;
+import com.example.article.repository.FavoriteRepository;
 import com.example.article.service.ArticleService;
-import com.example.article.service.grpc.ProfileGrpcClient;
+import com.example.article.client.grpc.ProfileGrpcClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -38,6 +41,7 @@ public class ArticleServiceImpl implements ArticleService {
     private final ModelMapper modelMapper;
     private final ProfileGrpcClient profileGrpcClient;
     private final BuyerRepository buyerRepository;
+    private final FavoriteRepository favoriteRepository;
 
 
     @Transactional
@@ -56,8 +60,8 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_ARTICLE));
         ArticleDTO articleDTO = new ArticleDTO();
-
-        articleDTO.setPurchased(buyerRepository.existsByArticleIdAndBuyerId(articleId, UUID.fromString(userId)));
+        UUID byuerId = UUID.fromString(userId);
+        articleDTO.setPurchased(buyerRepository.existsByBuyerIdAndArticleId(byuerId, articleId));
         modelMapper.map(article, articleDTO);
         if (username.equals(article.getUsername())) {
             articleDTO.setOwner(true);
@@ -107,7 +111,8 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         PointsAndUserIdRequest pointsAndUserId = profileGrpcClient.getPointsAndUserId(username);
-        boolean alreadyPurchased = buyerRepository.existsByArticleIdAndBuyerId(articleId, pointsAndUserId.userId());
+        UUID buyerId = pointsAndUserId.userId();
+        boolean alreadyPurchased = buyerRepository.existsByBuyerIdAndArticleId(buyerId, articleId);
         if (pointsAndUserId.points() < article.getPrice()) {
             throw new InsufficientFundsException(INSUFFICIENT_FUNDS);
         } else if (alreadyPurchased) {
@@ -124,6 +129,24 @@ public class ArticleServiceImpl implements ArticleService {
 
 
         return profileGrpcClient.purchasingAnArticle(username, points);
+    }
+
+    @Transactional
+    @Override
+    public StringResponse addToFavoritesArticle(UUID articleId, String userId){
+
+
+        boolean alreadyPurchased = favoriteRepository.existsByUserIdAndArticleId(UUID.fromString(userId), articleId);
+        if (alreadyPurchased) {
+            throw new AccessDeniedException(THE_ARTICLE_IS_ALREADY_IN_FAVORITES);
+        }
+        Favorite favorite = Favorite
+                .builder()
+                .userId(UUID.fromString(userId))
+                .articleId(articleId)
+                .build();
+        favoriteRepository.save(favorite);
+        return new StringResponse("Статья успешно добавлено в 'Избраное'");
     }
 
 

@@ -1,5 +1,7 @@
 package com.example.article.controller;
 
+import com.example.article.service.grpc.ArticleGrpcService;
+import com.example.grpc.profileAndArticle.*;
 import com.example.article.model.dto.ArticleDTO;
 import com.example.article.model.enums.Role;
 import com.example.article.model.request.ArticleRequest;
@@ -23,6 +25,7 @@ import java.util.UUID;
 public class ArticleController {
 
     private final ArticleServiceImpl articleService;
+    private final ArticleGrpcService articleGrpcService;
 
     @PostMapping(value = "/create-article")
     @Operation(summary = "Создание Статьи")
@@ -73,12 +76,9 @@ public class ArticleController {
         return ResponseEntity.ok(articleService.purchasingAnArticle(articleId, username));
     }
 
-// @PostMapping("/add-to-favorites/{articleId}")
-//    public ResponseEntity<?> addToFavoritesArticle() {
-//        return ResponseEntity.ok();
-//    }
-
-
-
-
+    @PostMapping("/add-to-favorites/{articleId}")
+    public ResponseEntity<StringResponse> addToFavoritesArticle(@PathVariable UUID articleId,
+                                                   @RequestHeader (value = "userId", required = false) String userId) {
+        return ResponseEntity.ok(articleService.addToFavoritesArticle(articleId, userId));
+    }
 }

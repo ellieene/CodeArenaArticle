@@ -27,6 +27,7 @@ public class CommonStrings {
     public static final String JWT_EXCEPTION = "Ошибка с токеном";
 
     public static final String THE_ARTICLE_HAS_ALREADY_BEEN_PURCHASED = " Статья уже куплена.";
+    public static final String THE_ARTICLE_IS_ALREADY_IN_FAVORITES = " Статья уже в  'Избранных'.";
     public static final String ARTICLE_CREATE_SUCCESS = "Статья успешно создана.";
     public static final String ARTICLE_DELETE_SUCCESS = "Статья успешно удалена.";
     public static final String ARTICLE_EDIT_SUCCESS = "Статья успешно изменена.";

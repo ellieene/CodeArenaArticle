@@ -1,23 +1,39 @@
-package com.example.article.service.grpc;
+package com.example.article.client.grpc;
 
 import com.example.article.exception.EntityNotFoundException;
 import com.example.article.model.request.PointsAndUserIdRequest;
 import com.example.article.model.response.StringResponse;
-import com.example.grpc.user.*;
-import io.grpc.Status;
+import com.example.grpc.profileAndArticle.*;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.example.article.util.CommonStrings.*;
 
 @Service
 public class ProfileGrpcClient {
 
-    @GrpcClient("profileService")
-    private UserServiceGrpc.UserServiceBlockingStub userStub;
+    private final String profileServiceAddress = "codearena-profile:50051";
+    private final AtomicReference<UserServiceGrpc.UserServiceBlockingStub> lazyStub = new AtomicReference<>();
+
+    private UserServiceGrpc.UserServiceBlockingStub getStub() {
+        if (lazyStub.get() == null) {
+            synchronized (lazyStub) {
+                if (lazyStub.get() == null) {
+                    ManagedChannel channel = ManagedChannelBuilder
+                            .forTarget(profileServiceAddress)
+                            .usePlaintext()
+                            .build();
+                    lazyStub.set(UserServiceGrpc.newBlockingStub(channel));
+                }
+            }
+        }
+        return lazyStub.get();
+    }
 
     public PointsAndUserIdRequest getPointsAndUserId(String username) {
         try {
@@ -25,7 +41,7 @@ public class ProfileGrpcClient {
                     .setUsername(username)
                     .build();
 
-            PointsResponse response = userStub.getPointsAndUserId(request);
+            PointsResponse response = getStub().getPointsAndUserId(request);
 
             return new PointsAndUserIdRequest(
                     response.getPoints(),
@@ -33,7 +49,7 @@ public class ProfileGrpcClient {
             );
 
         } catch (StatusRuntimeException e) {
-            if (e.getStatus().getCode() == Status.Code.NOT_FOUND) {
+            if (e.getStatus().getCode().name().equals("NOT_FOUND")) {
                 throw new EntityNotFoundException(NOT_FOUND_USER);
             }
             throw new RuntimeException("Failed to get username: " + e.getStatus().getDescription(), e);
@@ -47,7 +63,7 @@ public class ProfileGrpcClient {
                     .setPoints(points)
                     .build();
 
-            PurchasingResponse response = userStub.purchasingAnArticle(request);
+            PurchasingResponse response = getStub().purchasingAnArticle(request);
             if (!response.getPurchasing()) {
                 throw new RuntimeException(FAILED_TO_THE_PURCHASING);
             }
@@ -55,10 +71,10 @@ public class ProfileGrpcClient {
                     ARTICLE_SUCCESS
             );
         } catch (StatusRuntimeException e) {
-            if (e.getStatus().getCode() == Status.Code.NOT_FOUND) {
+            if (e.getStatus().getCode().name().equals("NOT_FOUND")) {
                 throw new EntityNotFoundException(NOT_FOUND_USER);
             }
-            throw new RuntimeException("Failed to get username: " + e.getStatus().getDescription(), e);
+            throw new RuntimeException("Failed to purchasing article: " + e.getStatus().getDescription(), e);
         }
     }
 }

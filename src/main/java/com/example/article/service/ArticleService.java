@@ -23,4 +23,6 @@ public interface ArticleService {
     StringResponse deleteArticle(UUID articleId, String username, Role role);
 
     StringResponse purchasingAnArticle(UUID articleId, String username);
+
+    StringResponse addToFavoritesArticle(UUID articleId, String userId);
 }
