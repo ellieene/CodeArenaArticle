@@ -31,6 +31,7 @@ public class ArticleGrpcService extends UserServiceGrpc.UserServiceImplBase {
 
             FavoriteResponse.Builder responseBuilder = FavoriteResponse.newBuilder();
 
+
             if (favoritesOpt.isPresent()) {
                 List<Favorite> favorites = favoritesOpt.get();
                 for (Favorite fav : favorites) {
